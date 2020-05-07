@@ -24,7 +24,7 @@ if [ "$?" = "0" ]; then
                 sed -i -e 's/\r//g' ~/getdeployment.sh
 		
 		chmod +x ~/getdeployment.sh
-		exec ~/getdeployment.sh
+		exec ~/getdeployment.sh $username $password
 		rm ~/startup.sh
 		exit 1
 		
