@@ -15,7 +15,7 @@ echo
 echo "Checking credentials"
 
 filepath="${baselocation}getdeployment.sh"
-wget -q --no-check-certificate --user=$username --password=$password $filepath
+wget -q --no-check-certificate --load-cookies cookies.txt --keep-session-cookies --user=$username --password=$password $filepath
 
 if [ "$?" = "0" ]; then
 		echo "Login successful"
