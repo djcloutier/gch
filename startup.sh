@@ -64,5 +64,5 @@ read -p "Did you copy your cookie file? (Y/n): " havecookie
 		if  [ "$havecookie" == "y" ];  then
 		    getDeploy
 		    else
-		    echo "copy your cookie file (cookie.txt) and run this script again."
+		    echo "copy your cookie file (cookies.txt) and run this script again. See technote on the knowledgebase (under Linux section) for details"
 		fi
