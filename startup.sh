@@ -9,7 +9,7 @@ echo "******Please enter your Glatt credentials.******"
 echo "************************************************"
 echo
 echo
-read -p "Enter your username: " username
+read -p "Enter your username (email address): " username
 read -s -p "Enter your password: " password
 echo
 echo "Checking credentials"
