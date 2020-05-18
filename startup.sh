@@ -50,4 +50,19 @@ if [ "$(id -u)" != "0" ]; then
    exit $?
 fi
 
-getDeploy
+##intall additional packaged
+apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
+adduser glatt libvirt 
+adduser glatt libvirt-qemu
+adduser glatt kvm
+## load the backports version of cockpit to enable snazzy new features
+apt install -y -t bionic-backports cockpit cockpit-bridge cockpit-dashboard cockpit-docker cockpit-machines cockpit-networkmanager cockpit-storaged cockpit-system cockpit-ws libguestfs-tools p7zip-full
+
+read -p "Did you copy your cookie file? (Y/n): " havecookie
+		havecookie=${havecookie:-y}
+
+		if  [ "$havecookie" == "y" ];  then
+		    getDeploy
+		    else
+		    echo "copy your cookie file (cookie.txt) and run this script again."
+		fi
