@@ -65,53 +65,65 @@ case "$(lsb_release -rs)" in
     *) ub1604="" ;;
 esac
 
-#get the latest versions of Ubuntu LTS
+#get the latest versions of Ubuntu LTS ***********************************************************************
 
 tmphtml=$tmp/tmphtml
 rm $tmphtml >/dev/null 2>&1
 wget -O $tmphtml 'http://releases.ubuntu.com/' >/dev/null 2>&1
 
-prec=$(fgrep Precise $tmphtml | head -1 | awk '{print $3}' | sed 's/href=\"//; s/\/\"//')
-trus=$(fgrep Trusty $tmphtml | head -1 | awk '{print $3}' | sed 's/href=\"//; s/\/\"//')
-xenn=$(fgrep Xenial $tmphtml | head -1 | awk '{print $3}' | sed 's/href=\"//; s/\/\"//')
-bion=$(fgrep Bionic $tmphtml | head -1 | awk '{print $3}' | sed 's/href=\"//; s/\/\"//')
-prec_vers=$(fgrep Precise $tmphtml | head -1 | awk '{print $6}')
-trus_vers=$(fgrep Trusty $tmphtml | head -1 | awk '{print $6}')
-xenn_vers=$(fgrep Xenial $tmphtml | head -1 | awk '{print $6}')
-bion_vers=$(fgrep Bionic $tmphtml | head -1 | awk '{print $6}')
+# create the menu based on available versions from
+# http://cdimage.ubuntu.com/releases/
+# http://releases.ubuntu.com/
 
+WORKFILE=www.list
+EXCLUDE_LIST='torrent|zsync|live'
+COUNTER=1
+if [ ! -z $1 ] && [ $1 == "rebuild" ]; then
+    rm -f ${WORKFILE}
+fi
+if [ ! -e ${WORKFILE} ]; then
+     echo Building menu from available builds
+     for version in $(wget -qO - http://cdimage.ubuntu.com/releases/ | grep -w DIR | grep -oP href=\"[0-9].* | cut -d'"' -f2 | tr -d '/'); do
+        TITLE=$(wget -qO - http://cdimage.ubuntu.com/releases/${version}/release | grep h1 | sed s'/^ *//g' | sed s'/^.*\(Ubuntu.*\).*$/\1/' | sed s'|</h1>||g')
+        CODE=$(echo ${TITLE} | cut -d "(" -f2 | tr -d ")")
+        URL=http://releases.ubuntu.com/${version}/
+        wget -qO - ${URL} | grep server | grep amd64 | egrep -v ${EXCLUDE_LIST} > /dev/null
+        if [ $? -ne 0 ] ; then
+            URL=http://cdimage.ubuntu.com/releases/${version}/release/
+        fi
+        FILE=$(wget -qO - ${URL} | grep server-amd64 | grep -o ubuntu.*.iso | egrep -v ${EXCLUDE_LIST} | grep ">" | cut -d ">" -f2 | sort -u)
+        FILE=$(echo ${FILE} | tr "\n" " " | tr "\r" " ")
+        if [[ ! -z ${FILE} ]]; then
+            echo ${TITLE}
+            for iso in ${FILE}; do
+                ver=$(echo ${iso} | cut -d- -f2)
+                if [ ! -e ${WORKFILE} ] || ! grep -q "${ver} " ${WORKFILE}; then
+                    echo "${COUNTER} ${ver} ${URL} ${iso} \"${CODE}\"" >> ${WORKFILE}
+                    ((COUNTER++))
+                fi
+            done
+        fi
+     done | uniq
+fi
 
-
-# ask whether to include vmware tools or not
-while true; do
+# display the menu for user to select version
+echo
+MIN=1
+MAX=$(tail -1 ${WORKFILE} | awk '{print $1}')
+ubver=0
+while [ ${ubver} -lt ${MIN} ] || [ ${ubver} -gt ${MAX} ]; do
     echo " which ubuntu edition would you like to remaster:"
     echo
-    echo "  [1] Ubuntu $prec LTS Server amd64 - Precise Pangolin"
-    echo "  [2] Ubuntu $trus LTS Server amd64 - Trusty Tahr"
-    echo "  [3] Ubuntu $xenn LTS Server amd64 - Xenial Xerus"
-    echo "  [4] Ubuntu $bion LTS Server amd64 - Bionic Beaver"
+    cat ${WORKFILE} | while read A B C D E; do
+        echo " [$A] Ubuntu $B ($E)"
+    done
     echo
-    read -p " please enter your preference: [1|2|3|4]: " ubver
-    case $ubver in
-        [1]* )  download_file="ubuntu-$prec_vers-server-amd64.iso"           # filename of the iso to be downloaded
-                download_location="http://releases.ubuntu.com/$prec/"     # location of the file to be downloaded
-                new_iso_name="ubuntu-$prec_vers-server-amd64-unattended.iso" # filename of the new iso file to be created
-                break;;
-	[2]* )  download_file="ubuntu-$trus_vers-server-amd64.iso"             # filename of the iso to be downloaded
-                download_location="http://releases.ubuntu.com/$trus/"     # location of the file to be downloaded
-                new_iso_name="ubuntu-$trus_vers-server-amd64-unattended.iso"   # filename of the new iso file to be created
-                break;;
-        [3]* )  download_file="ubuntu-$xenn_vers-server-amd64.iso"
-                download_location="http://releases.ubuntu.com/$xenn/"
-                new_iso_name="ubuntu-$xenn_vers-server-amd64-unattended.iso"
-                break;;
-        [4]* )  download_file="ubuntu-$bion_vers-server-amd64.iso"
-                download_location="http://cdimage.ubuntu.com/releases/$bion/release/"
-                new_iso_name="ubuntu-$bion_vers-server-amd64-unattended.iso"
-                break;;
-        * ) echo " please answer [1], [2], [3] or [4]";;
-    esac
+    read -p " please enter your preference: [${MIN}-${MAX}]: " ubver
 done
+
+download_file=$(grep -w ^$ubver ${WORKFILE} | awk '{print $4}')           # filename of the iso to be downloaded
+download_location=$(grep -w ^$ubver ${WORKFILE} | awk '{print $3}')     # location of the file to be downloaded
+new_iso_name="ubuntu-$(grep -w ^$ubver ${WORKFILE} | awk '{print $2}')-server-amd64-unattended.iso" # filename of the new iso file to be created
 
 if [ -f /etc/timezone ]; then
   timezone=`cat /etc/timezone`
@@ -122,8 +134,7 @@ else
   timezone=`find /usr/share/zoneinfo/ -type f -exec md5sum {} \; | grep "^$checksum" | sed "s/.*\/usr\/share\/zoneinfo\///" | head -n 1`
 fi
 
-
-# ask the user questions about his/her preferences
+# ask the user questions about his/her preferences ***********************************************************
 read -ep " please enter your preferred timezone: " -i "${timezone}" timezone
 read -ep " please enter your preferred username: " -i "glatt" username
 read -sp " please enter your preferred password: " password
