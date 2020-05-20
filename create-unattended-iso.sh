@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
 
 # file names & paths
 tmp="$HOME"  # destination folder to store the final iso file
@@ -76,7 +77,7 @@ wget -O $tmphtml 'http://releases.ubuntu.com/' >/dev/null 2>&1
 # http://releases.ubuntu.com/
 
 WORKFILE=www.list
-EXCLUDE_LIST='torrent|zsync|live'
+EXCLUDE_LIST='torrent|zsync|unwanted'
 COUNTER=1
 if [ ! -z $1 ] && [ $1 == "rebuild" ]; then
     rm -f ${WORKFILE}
@@ -87,6 +88,7 @@ if [ ! -e ${WORKFILE} ]; then
         TITLE=$(wget -qO - http://cdimage.ubuntu.com/releases/${version}/release | grep h1 | sed s'/^ *//g' | sed s'/^.*\(Ubuntu.*\).*$/\1/' | sed s'|</h1>||g')
         CODE=$(echo ${TITLE} | cut -d "(" -f2 | tr -d ")")
         URL=http://releases.ubuntu.com/${version}/
+echo $URL
         wget -qO - ${URL} | grep server | grep amd64 | egrep -v ${EXCLUDE_LIST} > /dev/null
         if [ $? -ne 0 ] ; then
             URL=http://cdimage.ubuntu.com/releases/${version}/release/
