@@ -3,19 +3,32 @@
 
 baselocation="https://organization.glatt.com/ptpA/sw/gat/Documents/Deployment/"
 
-getDeploy () {
-echo "************************************************"
-echo "******Please enter your Glatt credentials.******"
-echo "************************************************"
-echo
-echo
-read -p "Enter your username (email address): " username
-read -s -p "Enter your password: " password
-echo
-echo "Checking credentials"
+getCredentials () {
+
+if [ "$username" == "" ]; then
+if [[ $graphical == "true" ]]; 
+then
+username=$(zenity --entry --text="Enter your Glatt username (email address)");
+password=$(zenity --password --text="Enter your password" );
+else
+	echo "************************************************"
+	echo "******Please enter your Glatt credentials.******"
+	echo "************************************************"
+	echo
+	echo
+	read -p "Enter your username (email address): " username
+	read -s -p "Enter your password: " password
+	echo
+	fi
+fi
+
+}
+
+getDeployRem () {
+getCredentials
 
 filepath="${baselocation}getdeployment.sh"
-wget -q --no-check-certificate --load-cookies cookies.txt --keep-session-cookies --user=$username --password=$password $filepath
+wget -q --no-check-certificate --user=$username --password=$password $filepath
 
 if [ "$?" = "0" ]; then
 		echo "Login successful"
@@ -42,6 +55,38 @@ fi
 
 }
 
+getDeployLoc () {
+getCredentials
+mountPAD
+DeployRepo="Deployment"
+git clone --depth 1  "/tmp/pad/Development/GIT/${DeployRepo}"
+
+for file in ./${DeployRepo}/scripts/*
+do
+  chmod +x "$file"
+done
+
+unmountPAD
+
+#install the GUI
+./${DeployRepo}/scripts/install-gui.sh
+}
+
+unmountPAD () {
+umount /tmp/pad
+}
+
+mountPAD () {
+
+read -p "Enter shared folder name: (//192.168.101.108/EEDIV$/PAD)" padpath
+		padpath=${padpath:-//192.168.101.108/EEDIV$/PAD}
+		mkdir /tmp/pad
+		umount /tmp/pad
+
+mountstring="username=${username},password=${password} ${padpath} /tmp/pad"
+sudo mount -t cifs -o $mountstring
+}
+
 # check for root privilege
 if [ "$(id -u)" != "0" ]; then
    echo " this script must be run as root"
@@ -50,19 +95,18 @@ if [ "$(id -u)" != "0" ]; then
    exit $?
 fi
 
-##intall additional packaged
-apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
-adduser glatt libvirt 
-adduser glatt libvirt-qemu
-adduser glatt kvm
-## load the backports version of cockpit to enable snazzy new features
-apt install -y -t bionic-backports cockpit cockpit-bridge cockpit-dashboard cockpit-docker cockpit-machines cockpit-networkmanager cockpit-storaged cockpit-system cockpit-ws libguestfs-tools p7zip-full
+#see if user is inside GAT
+if ping -c 1 192.168.101.108 &> /dev/null
+then
+  getDeployLoc
+else
+  read -p "I can't reach the file server. Are you connected to the Glatt network?(Y)" locGAT
+locGat=${locGAT:-y}
 
-read -p "Did you copy your cookie file? (Y/n): " havecookie
-		havecookie=${havecookie:-y}
+if  [ "$locGAT" == "y" ];  then
+	getDeployLoc
 
-		if  [ "$havecookie" == "y" ];  then
-		    getDeploy
-		    else
-		    echo "copy your cookie file (cookies.txt) and run this script again. See technote on the knowledgebase (under Linux section) for details"
-		fi
+else
+	getDeployRem
+fi
+fi
