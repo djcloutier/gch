@@ -95,6 +95,15 @@ if [ "$(id -u)" != "0" ]; then
    exit $?
 fi
 
+##intall additional packages
+apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
+apt install -y -t bionic-backports cockpit cockpit-bridge cockpit-dashboard cockpit-docker cockpit-machines cockpit-networkmanager cockpit-storaged cockpit-system cockpit-ws libguestfs-tools p7zip-full
+
+#update users
+adduser glatt libvirt 
+adduser glatt libvirt-qemu
+adduser glatt kvm
+
 #see if user is inside GAT
 if ping -c 1 192.168.101.108 &> /dev/null
 then
