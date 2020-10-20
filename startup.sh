@@ -24,6 +24,21 @@ fi
 
 }
 
+installGuiRemote () {
+sudo apt install -y --no-install-recommends ubuntu-desktop
+sudo apt install -y remmina firefox gedit nautilus-admin xrdp gnome-startup-applications gnome-tweaks p7zip 
+curl -L -o ~/teamviewer-host_amd64.deb https://download.teamviewer.com/download/linux/teamviewer-host_amd64.deb
+sudo apt install -y ./teamviewer-host_amd64.deb
+rm -f ~/teamviewer-host_amd64.deb
+rm -f ~/install-gui.sh
+
+read -p "Enter a Teamviewer password" tvpass
+
+sudo teamviewer passwd $tvpass
+reboot
+
+}
+
 getDeployRem () {
 getCredentials
 
@@ -70,6 +85,7 @@ unmountPAD
 
 #install the GUI
 ./${DeployRepo}/scripts/install-gui.sh
+
 }
 
 unmountPAD () {
@@ -107,15 +123,21 @@ adduser glatt kvm
 #see if user is inside GAT
 if ping -c 1 192.168.101.108 &> /dev/null
 then
-  getDeployLoc
+  	getDeployLoc
 else
-  read -p "I can't reach the file server. Are you connected to the Glatt network?(Y)" locGAT
-locGat=${locGAT:-y}
+  	read -p "I can't reach the file server. Are you connected to the Glatt network?(Y)" locGAT
+	locGat=${locGAT:-y}
 
-if  [ "$locGAT" == "y" ];  then
-	getDeployLoc
+	if  [ "$locGAT" == "y" ];  then
+		getDeployLoc
+	else
 
-else
-	getDeployRem
-fi
+	read -p "Are you a Glatt customer?(Y)" cust
+	cust=${cust:-y}
+		if  [ "$cust" == "y" ];  then
+			installGuiRemote
+		else
+			getDeployRem
+		fi
+	fi
 fi
