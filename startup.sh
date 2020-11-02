@@ -40,6 +40,18 @@ reboot
 }
 
 getDeployRem () {
+DeployRepo="Deployment"
+if [ -d "./${DeployRepo}" ]; then
+echo "Found local repository...Using that."
+for file in ./${DeployRepo}/scripts/*
+do
+  chmod +x "$file"
+done
+
+#install the GUI
+./${DeployRepo}/scripts/install-gui.sh
+
+else
 getCredentials
 
 filepath="${baselocation}getdeployment.sh"
@@ -67,8 +79,10 @@ else
 		fi
 
 fi
+fi
 
 }
+
 
 getDeployLoc () {
 getCredentials
