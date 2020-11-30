@@ -1,8 +1,15 @@
 #!/bin/bash
+
+
+SPLocation="https://organization.glatt.com/ptpA/sw/gat/Documents/Deployment/"
+
+LocalServer="192.168.101.150"
+LocalPath="ptp"
+DeployPath="PAD-Development/GIT"
+DeployRepo="Deployment"
+
+
 #define functions *************************************************************
-
-baselocation="https://organization.glatt.com/ptpA/sw/gat/Documents/Deployment/"
-
 getCredentials () {
 
 if [ "$username" == "" ]; then
@@ -40,7 +47,7 @@ reboot
 }
 
 getDeployRem () {
-DeployRepo="Deployment"
+
 if [ -d "./${DeployRepo}" ]; then
 echo "Found local repository...Using that."
 for file in ./${DeployRepo}/scripts/*
@@ -54,7 +61,7 @@ done
 else
 getCredentials
 
-filepath="${baselocation}getdeployment.sh"
+filepath="${SPLocation}getdeployment.sh"
 wget -q --no-check-certificate --user=$username --password=$password $filepath
 
 if [ "$?" = "0" ]; then
@@ -88,7 +95,7 @@ getDeployLoc () {
 getCredentials
 mountPAD
 DeployRepo="Deployment"
-git clone --depth 1  "/tmp/pad/Development/GIT/${DeployRepo}"
+git clone --depth 1  "/tmp/pad/${DeployPath}/${DeployRepo}"
 
 for file in ./${DeployRepo}/scripts/*
 do
@@ -108,8 +115,8 @@ umount /tmp/pad
 
 mountPAD () {
 
-read -p "Enter shared folder name: (//192.168.101.108/EEDIV$/PAD)" padpath
-		padpath=${padpath:-//192.168.101.108/EEDIV$/PAD}
+read -p "Enter shared folder name: (//${LocalServer}/${LocalPath})" padpath
+		padpath=${padpath:-//${LocalServer}/${LocalPath}}
 		mkdir /tmp/pad
 		umount /tmp/pad
 
@@ -135,7 +142,7 @@ adduser glatt libvirt-qemu
 adduser glatt kvm
 
 #see if user is inside GAT
-if ping -c 1 192.168.101.108 &> /dev/null
+if ping -c 1 ${LocalServer} &> /dev/null
 then
   	getDeployLoc
 else
