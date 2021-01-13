@@ -136,6 +136,13 @@ fi
 apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
 apt install -y -t bionic-backports cockpit cockpit-bridge cockpit-dashboard cockpit-docker cockpit-machines cockpit-networkmanager cockpit-storaged cockpit-system cockpit-ws libguestfs-tools p7zip-full
 
+##install TailScale
+curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/bionic.gpg | sudo apt-key add -
+curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/bionic.list | sudo tee /etc/apt/sources.list.d/tailscale.list
+apt update
+apt install tailscale
+
+
 #update users
 adduser glatt libvirt 
 adduser glatt libvirt-qemu
@@ -152,13 +159,18 @@ else
 	if  [ "$locGAT" == "y" ];  then
 		getDeployLoc
 	else
-
 	read -p "Are you a Glatt customer?(Y)" cust
 	cust=${cust:-y}
 		if  [ "$cust" == "y" ];  then
 			installGuiRemote
 		else
-			getDeployRem
+			read -p "Do you want to start tailscale for VPN access" tscale
+			if  [ "$tscale" == "y" ];  then
+				sudo tailscale up
+				getDeployLoc
+			else
+				getDeployRem
+			fi
 		fi
 	fi
 fi
