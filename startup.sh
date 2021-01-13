@@ -164,9 +164,9 @@ else
 		if  [ "$cust" == "y" ];  then
 			installGuiRemote
 		else
-			read -p "Do you want to start tailscale for VPN access" tscale
+			read -p "Do you want to start tailscale for VPN access?(Y)" tscale
 			if  [ "$tscale" == "y" ];  then
-				sudo tailscale up
+				sudo tailscale up --accept-routes
 				getDeployLoc
 			else
 				getDeployRem
