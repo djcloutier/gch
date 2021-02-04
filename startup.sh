@@ -140,8 +140,8 @@ apt install -y -t bionic-backports cockpit cockpit-bridge cockpit-dashboard cock
 curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/bionic.gpg | sudo apt-key add -
 curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/bionic.list | sudo tee /etc/apt/sources.list.d/tailscale.list
 apt update
-apt install tailscale
-
+apt install -y tailscale
+apt install -y qrencode
 
 #update users
 adduser glatt libvirt 
@@ -166,7 +166,10 @@ else
 		else
 			read -p "Do you want to start tailscale for VPN access?(Y)" tscale
 			if  [ "$tscale" == "y" ];  then
+#	show qrcode for tailscale url
+#			        sudo service tailscaled status | grep -oP "(https)://login.([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?" | qrencode -m 2 -t utf8
 				sudo tailscale up --accept-routes
+				clear
 				getDeployLoc
 			else
 				getDeployRem
