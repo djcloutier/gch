@@ -167,9 +167,16 @@ else
 			read -p "Do you want to start tailscale for VPN access?(Y)" tscale
 			if  [ "$tscale" == "y" ];  then
 #	show qrcode for tailscale url
-#			        sudo service tailscaled status | grep -oP "(https)://login.([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?" | qrencode -m 2 -t utf8
+				tsURL=$(sudo service tailscaled status | grep -oP "(https)://login.([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")                           
+				echo "To authenticate, visit or scan QR code: "
+				echo " "
+				echo "   $tsURL"
+				echo " "
+				qrencode $tsURL -m 2 -t utf8
+				echo " "
+				echo "Press ENTER key once authentication has succeeded,"
+				read -p ""
 				sudo tailscale up --accept-routes
-				clear
 				getDeployLoc
 			else
 				getDeployRem
