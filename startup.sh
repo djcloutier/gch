@@ -176,7 +176,7 @@ else
 				echo " "
 				echo "Press ENTER key once authentication has succeeded,"
 				read -p ""
-				sudo tailscale up --accept-routes
+				sudo tailscale up --accept-routes --advertise-tags=tag:customer,tag:hypervisor
 				getDeployLoc
 			else
 				getDeployRem
