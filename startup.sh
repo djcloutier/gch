@@ -172,7 +172,7 @@ else
 				echo " "
 				echo "   $tsURL"
 				echo " "
-				qrencode $tsURL -m 2 -t utf8
+				qrencode $tsURL -m 2 -t ansi
 				echo " "
 				echo "Press ENTER key once authentication has succeeded,"
 				read -p ""
