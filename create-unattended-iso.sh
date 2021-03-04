@@ -124,7 +124,7 @@ done
 
 download_file=$(grep -w ^$ubver ${WORKFILE} | awk '{print $4}')           # filename of the iso to be downloaded
 download_location=$(grep -w ^$ubver ${WORKFILE} | awk '{print $3}')     # location of the file to be downloaded
-new_iso_name="ubuntu-$(grep -w ^$ubver ${WORKFILE} | awk '{print $2}')-server-amd64-unattended.iso" # filename of the new iso file to be created
+new_iso_name="gch-$(grep -w ^$ubver ${WORKFILE} | awk '{print $2}')-server-amd64.iso" # filename of the new iso file to be created
 
 if [ -f /etc/timezone ]; then
   timezone=`cat /etc/timezone`
