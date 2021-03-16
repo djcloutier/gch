@@ -1,2 +1,2 @@
-1 18.04.2 http://cdimage.ubuntu.com/releases/18.04/release/ ubuntu-18.04.2-server-amd64.iso "GCH V3.1"
-2 18.04.5 http://cdimage.ubuntu.com/releases/18.04/release/ ubuntu-18.04.5-server-amd64.iso "GCH V3.1.2"
+1 18.04.2 http://cdimage.ubuntu.com/releases/18.04/release/ ubuntu-18.04.2-server-amd64.iso GCH-V3.1
+2 18.04.5 http://cdimage.ubuntu.com/releases/18.04/release/ ubuntu-18.04.5-server-amd64.iso GCH-V3.1.2

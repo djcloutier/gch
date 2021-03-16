@@ -122,9 +122,11 @@ while [ ${ubver} -lt ${MIN} ] || [ ${ubver} -gt ${MAX} ]; do
     read -p " please enter your preference: [${MIN}-${MAX}]: " ubver
 done
 
-download_file=$(grep -w ^$ubver ${WORKFILE} | awk '{print $4}')           # filename of the iso to be downloaded
+download_file=$(grep -w ^$ubver ${WORKFILE} | awk '{print $4}')         # filename of the iso to be downloaded
 download_location=$(grep -w ^$ubver ${WORKFILE} | awk '{print $3}')     # location of the file to be downloaded
-new_iso_name="gch-$(grep -w ^$ubver ${WORKFILE} | awk '{print $2}')-server-amd64.iso" # filename of the new iso file to be created
+gch_version=$(grep -w ^$ubver ${WORKFILE} | awk '{print $5}')           # gch version
+base_iso_name="$(grep -w ^$ubver ${WORKFILE} | awk '{print $2}')-server-amd64.iso" # filename of the new iso file to be created
+
 
 if [ -f /etc/timezone ]; then
   timezone=`cat /etc/timezone`
@@ -145,6 +147,8 @@ printf "\n"
 read -ep " Make ISO bootable via USB: " -i "yes" bootable
 printf "\n"
 read -ep " Use Auto-RAID setup (for machines with multiple disks): " -i "yes" useraid
+
+
 
 # check if the passwords match to prevent headaches
 if [[ "$password" != "$password2" ]]; then
@@ -171,9 +175,14 @@ fi
 # download seed file
 if [[ $useraid == "yes" ]] || [[ $useraid == "y" ]]; then
 seed_file="sraid.seed"
+rtype="software-raid"
 	else
 seed_file="noraid.seed"
+rtype="no-raid"
 fi
+
+new_iso_name="$gch_version-$rtype-$base_iso_name"
+
 
 if [[ ! -f $tmp/$seed_file ]]; then
     echo -n " downloading $seed_file: "
