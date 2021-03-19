@@ -50,10 +50,7 @@ getDeployRem () {
 
 if [ -d "./${DeployRepo}" ]; then
 echo "Found local repository...Using that."
-for file in ./${DeployRepo}/scripts/*
-do
-  chmod +x "$file"
-done
+find ./${DeployRepo}/ -type f -iname "*.sh" -exec chmod +x {} \;
 
 #install the GUI
 ./${DeployRepo}/scripts/install-gui.sh
@@ -95,7 +92,7 @@ getDeployLoc () {
 getCredentials
 mountPAD
 DeployRepo="Deployment"
-git clone --depth 1  "/tmp/pad/${DeployPath}/${DeployRepo}"
+sudo -u glatt git clone --depth 1  "/tmp/pad/${DeployPath}/${DeployRepo}"
 
 for file in ./${DeployRepo}/scripts/*
 do
