@@ -145,6 +145,11 @@ adduser glatt libvirt
 adduser glatt libvirt-qemu
 adduser glatt kvm
 
+#create default storage pool
+virsh pool-define-as default dir - - - - "/var/lib/libvirt/images"
+virsh pool-start default
+virsh pool-autostart default
+
 #see if user is inside GAT
 if ping -c 1 ${LocalServer} &> /dev/null
 then
