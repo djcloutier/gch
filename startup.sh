@@ -150,6 +150,9 @@ virsh pool-define-as default dir - - - - "/var/lib/libvirt/images"
 virsh pool-start default
 virsh pool-autostart default
 
+#update path
+sudo -u glatt echo "export PATH=/home/glatt/Deployment/scripts/:$PATH" | tee -a  .bashrc > /dev/null
+
 #see if user is inside GAT
 if ping -c 1 ${LocalServer} &> /dev/null
 then
