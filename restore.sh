@@ -1,4 +1,13 @@
 #!/bin/bash
+
+read -p "This will wipe your drive partitions and create a new RAID1 volume. If this is is what you want to do, type 'destroy' or anything else to exit: " destroy
+
+if [ "$destroy" != "destroy" ]; then
+   echo " no changes made. Exitting."
+   echo
+   exit
+fi
+
 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/sda
   o # clear the in memory partition table
   n # new partition
