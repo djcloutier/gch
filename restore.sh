@@ -38,10 +38,7 @@ mount --bind /dev /mnt/gch/dev
 mount --bind /proc /mnt/gch/proc
 mount --bind /sys /mnt/gch/sys
 
-chroot /mnt/gch
-
-#install grub
-grub-install /dev/sda
-grub-install /dev/sdb
+#chroot and install grub
+chroot /mnt/gch /bin/bash -c "grub-install /dev/sda ; grub-install /dev/sdb ; exit"
 
 exit
