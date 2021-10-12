@@ -221,7 +221,9 @@ if [ "$(id -u)" != "0" ]; then
    exit $?
 fi
 
-if  [ "$VER" == "20.04" ];  then
+checkEnvironment
+
+if  [ $VER == "20.04" ];  then
 
 	deploy2004
 
