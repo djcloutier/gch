@@ -8,6 +8,7 @@ LocalPath="ptp"
 DeployPath="PAD-Development/GIT"
 DeployRepo="Deployment"
 
+#
 
 #define functions *************************************************************
 getCredentials () {
@@ -121,14 +122,43 @@ mountstring="username=${username},password=${password} ${padpath} /tmp/pad"
 sudo mount -t cifs -o $mountstring
 }
 
-# check for root privilege
-if [ "$(id -u)" != "0" ]; then
-   echo " this script must be run as root"
-   echo
-   sudo "$0" "$@"
-   exit $?
+checkEnvironment () {
+
+if [ -f /etc/os-release ]; then
+    # freedesktop.org and systemd
+    . /etc/os-release
+    OS=$NAME
+    VER=$VERSION_ID
+elif type lsb_release >/dev/null 2>&1; then
+    # linuxbase.org
+    OS=$(lsb_release -si)
+    VER=$(lsb_release -sr)
+elif [ -f /etc/lsb-release ]; then
+    # For some versions of Debian/Ubuntu without lsb_release command
+    . /etc/lsb-release
+    OS=$DISTRIB_ID
+    VER=$DISTRIB_RELEASE
+elif [ -f /etc/debian_version ]; then
+    # Older Debian/Ubuntu/etc.
+    OS=Debian
+    VER=$(cat /etc/debian_version)
+elif [ -f /etc/SuSe-release ]; then
+    # Older SuSE/etc.
+    ...
+elif [ -f /etc/redhat-release ]; then
+    # Older Red Hat, CentOS, etc.
+    ...
+else
+    # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
+    OS=$(uname -s)
+    VER=$(uname -r)
 fi
 
+echo $OS
+echo $VER
+}
+
+deploy1804 () {
 ##intall additional packages
 apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
 apt install -y -t bionic-backports cockpit cockpit-bridge cockpit-dashboard cockpit-docker cockpit-machines cockpit-networkmanager cockpit-storaged cockpit-system cockpit-ws libguestfs-tools p7zip-full
@@ -149,6 +179,55 @@ adduser glatt kvm
 virsh pool-define-as default dir - - - - "/var/lib/libvirt/images"
 virsh pool-start default
 virsh pool-autostart default
+}
+
+deploy2004 () {
+##intall additional packages
+apt update
+apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
+apt install -y -t cockpit cockpit-bridge cockpit-dashboard cockpit-machines cockpit-networkmanager cockpit-storaged cockpit-system cockpit-ws libguestfs-tools p7zip-full
+
+##add docker
+sudo apt install -y docker.io
+sudo usermod -aG docker glatt
+newgrp docker
+wget https://launchpad.net/ubuntu/+source/cockpit/215-1~ubuntu19.10.1/+build/18889196/+files/cockpit-docker_215-1~ubuntu19.10.1_all.deb
+apt install -y ./cockpit-docker_215-1~ubuntu19.10.1_all.deb
+
+##install TailScale
+curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add -
+curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/apt/sources.list.d/tailscale.list
+apt update
+apt install -y tailscale
+apt install -y qrencode
+
+#update users
+adduser glatt libvirt 
+adduser glatt libvirt-qemu
+adduser glatt kvm
+
+#create default storage pool
+virsh pool-define-as default dir - - - - "/var/lib/libvirt/images"
+virsh pool-start default
+virsh pool-autostart default
+}
+
+
+# check for root privilege ***********************************************************************************************************
+if [ "$(id -u)" != "0" ]; then
+   echo " this script must be run as root"
+   echo
+   sudo "$0" "$@"
+   exit $?
+fi
+
+if  [ "$VER" == "20.04" ];  then
+
+	deploy2004
+
+else
+	deploy1804
+fi
 
 #update path
 sudo -u glatt echo "export PATH=/home/glatt/Deployment/scripts/:$PATH" | tee -a  .bashrc > /dev/null
