@@ -185,7 +185,7 @@ deploy2004 () {
 ##intall additional packages
 apt update
 apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
-apt install -y -t cockpit cockpit-bridge cockpit-dashboard cockpit-machines cockpit-networkmanager cockpit-storaged cockpit-system cockpit-ws libguestfs-tools p7zip-full
+apt install -y cockpit cockpit-bridge cockpit-dashboard cockpit-machines cockpit-networkmanager cockpit-storaged cockpit-system cockpit-ws libguestfs-tools p7zip-full
 
 ##add docker
 sudo apt install -y docker.io
