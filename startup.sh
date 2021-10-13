@@ -190,7 +190,7 @@ apt install -y cockpit cockpit-bridge cockpit-dashboard cockpit-machines cockpit
 ##add docker
 sudo apt install -y docker.io
 sudo usermod -aG docker glatt
-newgrp docker
+#newgrp docker
 wget https://launchpad.net/ubuntu/+source/cockpit/215-1~ubuntu19.10.1/+build/18889196/+files/cockpit-docker_215-1~ubuntu19.10.1_all.deb
 apt install -y ./cockpit-docker_215-1~ubuntu19.10.1_all.deb
 
