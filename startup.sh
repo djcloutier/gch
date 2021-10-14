@@ -93,7 +93,7 @@ getDeployLoc () {
 getCredentials
 mountPAD
 DeployRepo="Deployment"
-sudo -u glatt git clone --depth 1  "/tmp/pad/${DeployPath}/${DeployRepo}" ${BLOC}
+sudo -u glatt git clone --depth 1  "/tmp/pad/${DeployPath}/${DeployRepo}" ${BLOC}/${DeployRepo}
 
 for file in ${BLOC}/${DeployRepo}/scripts/*
 do
@@ -236,7 +236,7 @@ else
 fi
 
 #update path
-sudo -u glatt echo "export PATH=/home/glatt/Deployment/scripts/:$PATH" | tee -a  .bashrc > /dev/null
+sudo -u glatt echo "export PATH=/usr/share/Deployment/scripts/:$PATH" | tee -a  .bashrc > /dev/null
 
 #see if user is inside GAT
 if ping -c 1 ${LocalServer} &> /dev/null
