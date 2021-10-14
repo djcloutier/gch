@@ -7,7 +7,7 @@ LocalServer="192.168.101.150"
 LocalPath="ptp"
 DeployPath="PAD-Development/GIT"
 DeployRepo="Deployment"
-
+BLOC="/usr/share"
 #
 
 #define functions *************************************************************
@@ -33,12 +33,14 @@ fi
 }
 
 installGuiRemote () {
+
+
 sudo apt install -y --no-install-recommends ubuntu-desktop
 sudo apt install -y remmina firefox gedit nautilus-admin xrdp gnome-startup-applications gnome-tweaks p7zip 
-curl -L -o ~/teamviewer-host_amd64.deb https://download.teamviewer.com/download/linux/teamviewer-host_amd64.deb
-sudo apt install -y ./teamviewer-host_amd64.deb
-rm -f ~/teamviewer-host_amd64.deb
-rm -f ~/install-gui.sh
+curl -L -o /tmp/teamviewer-host_amd64.deb https://download.teamviewer.com/download/linux/teamviewer-host_amd64.deb
+sudo apt install -y /tmp/teamviewer-host_amd64.deb
+rm -f /tmp/teamviewer-host_amd64.deb
+
 
 read -p "Enter a Teamviewer password" tvpass
 
@@ -49,12 +51,15 @@ reboot
 
 getDeployRem () {
 
-if [ -d "./${DeployRepo}" ]; then
+mkdir ${BLOC}/${DeployRepo}
+chmod 777 ${BLOC}/${DeployRepo}
+
+if [ -d "${BLOC}/${DeployRepo}" ]; then
 echo "Found local repository...Using that."
-find ./${DeployRepo}/ -type f -iname "*.sh" -exec chmod +x {} \;
+find ${BLOC}/${DeployRepo}/ -type f -iname "*.sh" -exec chmod +x {} \;
 
 #install the GUI
-./${DeployRepo}/scripts/install-gui.sh
+${BLOC}/${DeployRepo}/scripts/install-gui.sh
 
 else
 getCredentials
@@ -66,11 +71,11 @@ if [ "$?" = "0" ]; then
 		echo "Login successful"
 		
 		#strip carriage returns from text file in case it was saved in DOS format
-                sed -i -e 's/\r//g' ~/getdeployment.sh
+                sed -i -e 's/\r//g' ${BLOC}/getdeployment.sh
 		
-		chmod +x ~/getdeployment.sh
-		exec ~/getdeployment.sh $username $password
-		rm ~/startup.sh
+		chmod +x ${BLOC}/getdeployment.sh
+		exec ${BLOC}/getdeployment.sh $username $password
+		rm ${BLOC}/startup.sh
 		exit 1
 		
 	
@@ -90,20 +95,23 @@ fi
 
 
 getDeployLoc () {
+
+mkdir ${BLOC}/${DeployRepo}
+chmod 777 ${BLOC}/${DeployRepo}
 getCredentials
 mountPAD
 DeployRepo="Deployment"
-sudo -u glatt git clone --depth 1  "/tmp/pad/${DeployPath}/${DeployRepo}"
+sudo -u glatt git clone --depth 1  "/tmp/pad/${DeployPath}/${DeployRepo}" ${BLOC}/${DeployRepo}
 
-for file in ./${DeployRepo}/scripts/*
+for file in ${BLOC}/${DeployRepo}/scripts/*
 do
-  chmod +x "$file"
+  chmod 777 "$file"
 done
 
 unmountPAD
 
 #install the GUI
-./${DeployRepo}/scripts/install-gui.sh
+${BLOC}/${DeployRepo}/scripts/install-gui.sh
 
 }
 
@@ -159,6 +167,7 @@ echo $VER
 }
 
 deploy1804 () {
+
 ##intall additional packages
 apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
 apt install -y -t bionic-backports cockpit cockpit-bridge cockpit-dashboard cockpit-docker cockpit-machines cockpit-networkmanager cockpit-storaged cockpit-system cockpit-ws libguestfs-tools p7zip-full
@@ -182,6 +191,7 @@ virsh pool-autostart default
 }
 
 deploy2004 () {
+
 ##intall additional packages
 apt update
 apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
@@ -193,6 +203,7 @@ sudo usermod -aG docker glatt
 #newgrp docker
 wget https://launchpad.net/ubuntu/+source/cockpit/215-1~ubuntu19.10.1/+build/18889196/+files/cockpit-docker_215-1~ubuntu19.10.1_all.deb
 apt install -y ./cockpit-docker_215-1~ubuntu19.10.1_all.deb
+rm -f ./cockpit-docker_215-1~ubuntu19.10.1_all.deb
 
 ##install TailScale
 curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add -
@@ -232,7 +243,7 @@ else
 fi
 
 #update path
-sudo -u glatt echo "export PATH=/home/glatt/Deployment/scripts/:$PATH" | tee -a  .bashrc > /dev/null
+sudo -u glatt echo "export PATH=/usr/share/Deployment/scripts/:$PATH" | tee -a  .bashrc > /dev/null
 
 #see if user is inside GAT
 if ping -c 1 ${LocalServer} &> /dev/null
