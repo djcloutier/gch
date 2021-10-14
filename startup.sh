@@ -33,6 +33,8 @@ fi
 }
 
 installGuiRemote () {
+
+
 sudo apt install -y --no-install-recommends ubuntu-desktop
 sudo apt install -y remmina firefox gedit nautilus-admin xrdp gnome-startup-applications gnome-tweaks p7zip 
 curl -L -o /tmp/teamviewer-host_amd64.deb https://download.teamviewer.com/download/linux/teamviewer-host_amd64.deb
@@ -48,6 +50,9 @@ reboot
 }
 
 getDeployRem () {
+
+mkdir ${BLOC}/${DeployRepo}
+chmod 777 ${BLOC}/${DeployRepo}
 
 if [ -d "${BLOC}/${DeployRepo}" ]; then
 echo "Found local repository...Using that."
@@ -90,6 +95,9 @@ fi
 
 
 getDeployLoc () {
+
+mkdir ${BLOC}/${DeployRepo}
+chmod 777 ${BLOC}/${DeployRepo}
 getCredentials
 mountPAD
 DeployRepo="Deployment"
@@ -159,7 +167,6 @@ echo $VER
 }
 
 deploy1804 () {
-mkdir ${BLOC}/${DeployRepo}
 
 ##intall additional packages
 apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
@@ -184,7 +191,7 @@ virsh pool-autostart default
 }
 
 deploy2004 () {
-mkdir ${BLOC}/${DeployRepo}
+
 ##intall additional packages
 apt update
 apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
