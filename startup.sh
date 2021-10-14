@@ -159,7 +159,7 @@ echo $VER
 }
 
 deploy1804 () {
-touch ${BLOC}/${DeployRepo}
+mkdir ${BLOC}/${DeployRepo}
 
 ##intall additional packages
 apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
@@ -184,7 +184,7 @@ virsh pool-autostart default
 }
 
 deploy2004 () {
-touch ${BLOC}/${DeployRepo}
+mkdir ${BLOC}/${DeployRepo}
 ##intall additional packages
 apt update
 apt install -y nfs-common sshpass openssh-server ovmf cifs-utils
