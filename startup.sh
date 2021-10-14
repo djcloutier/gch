@@ -50,8 +50,7 @@ reboot
 }
 
 getDeployRem () {
-sudo rm /etc/netplan/00-installer-config.yaml
-sudo curl -o /etc/netplan/00-installer-config.yaml https://raw.githubusercontent.com/djcloutier/gch/master/00-installer-config.yaml
+
 
 mkdir ${BLOC}/${DeployRepo}
 chmod 777 ${BLOC}/${DeployRepo}
@@ -97,8 +96,7 @@ fi
 
 
 getDeployLoc () {
-sudo rm /etc/netplan/00-installer-config.yaml
-sudo curl -o /etc/netplan/00-installer-config.yaml https://raw.githubusercontent.com/djcloutier/gch/master/00-installer-config.yaml  
+  
 mkdir ${BLOC}/${DeployRepo}
 chmod 777 ${BLOC}/${DeployRepo}
 getCredentials
@@ -194,6 +192,8 @@ virsh pool-autostart default
 }
 
 deploy2004 () {
+sudo rm /etc/netplan/00-installer-config.yaml
+sudo curl -o /etc/netplan/00-installer-config.yaml https://raw.githubusercontent.com/djcloutier/gch/master/00-installer-config.yaml
 
 ##intall additional packages
 apt update
