@@ -7,6 +7,7 @@ LocalServer="192.168.101.150"
 LocalPath="ptp"
 DeployPath="PAD-Development/GIT"
 DeployRepo="Deployment"
+RepoPath="PAD-Development/deb_repo"
 BLOC="/usr/share"
 #
 
@@ -50,6 +51,7 @@ reboot
 }
 
 getDeployRem () {
+
 
 mkdir ${BLOC}/${DeployRepo}
 chmod 777 ${BLOC}/${DeployRepo}
@@ -95,18 +97,13 @@ fi
 
 
 getDeployLoc () {
-
-mkdir ${BLOC}/${DeployRepo}
-chmod 777 ${BLOC}/${DeployRepo}
+ 
 getCredentials
 mountPAD
-DeployRepo="Deployment"
-sudo -u glatt git clone --depth 1  "/tmp/pad/${DeployPath}/${DeployRepo}" ${BLOC}/${DeployRepo}
 
-for file in ${BLOC}/${DeployRepo}/scripts/*
-do
-  chmod 777 "$file"
-done
+sudo cp "/tmp/pad/${DebRepo}/glatt-tools_*.deb" /tmp/glatt-tools.deb
+sudo apt install -y /tmp/glatt-tools.deb
+sudo rm /tmp/glatt-tools.deb
 
 unmountPAD
 
@@ -191,6 +188,8 @@ virsh pool-autostart default
 }
 
 deploy2004 () {
+sudo rm /etc/netplan/00-installer-config.yaml
+sudo curl -o /etc/netplan/00-installer-config.yaml https://raw.githubusercontent.com/djcloutier/gch/master/00-installer-config.yaml
 
 ##intall additional packages
 apt update
