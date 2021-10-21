@@ -101,7 +101,7 @@ getDeployLoc () {
 getCredentials
 mountPAD
 
-sudo cp "/tmp/pad/${DebRepo}/glatt-tools_*.deb" /tmp/glatt-tools.deb
+sudo cp "/tmp/pad/${RepoPath}/glatt-tools_*.deb" /tmp/glatt-tools.deb
 sudo apt install -y /tmp/glatt-tools.deb
 sudo rm /tmp/glatt-tools.deb
 
