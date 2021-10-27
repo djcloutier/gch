@@ -234,7 +234,7 @@ else
 	read -p "Are you a Glatt customer?(Y)" cust
 	cust=${cust:-y}
 		if  [ "$cust" == "y" ];  then
-			echo "Please install the glatt tools package a
+			getDeployRem
 		else
 			read -p "Do you want to start tailscale for VPN access?(Y)" tscale
 			if  [ "$tscale" == "y" ];  then
