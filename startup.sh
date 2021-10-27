@@ -52,23 +52,16 @@ reboot
 
 getDeployRem () {
 
-if compgen -G "~/glatt-tools*.deb" > /dev/null; then
-    DEBEXISTS=true
-fi
+read -p "Please insert a USB flash drive containing the Glatt-Tools.deb file" resp
+sudo mkdir /media/usb
+mount /dev/sdc1 /media/usb
 
-FILE=${BLOC}/${DeployRepo}/scripts/install-gui.sh
-FILE2=
-if test -f "$FILE" || $DEBEXISTS; then
-    
-	cp ~/glatt-tools_*.deb /tmp/glatt-tools.deb
-	sudo apt install -y /tmp/glatt-tools.deb
-	sudo rm /tmp/glatt-tools.deb
-
-	#install the GUI
-	${BLOC}/${DeployRepo}/scripts/install-gui.sh
-else
-	echo "Please install Glatt-Tools manually or place the .deb filein your home folder and run setup again."
-fi
+sudo cp /media/usb/glatt-tools_*.deb /tmp/glatt-tools.deb
+sudo apt install -y /tmp/glatt-tools.deb
+sudo rm /tmp/glatt-tools.deb
+sudo umount /media/usb
+#install the GUI
+${BLOC}/${DeployRepo}/scripts/install-gui.sh
 }
 
 
@@ -231,12 +224,13 @@ else
 	if  [ "$locGAT" == "y" ];  then
 		getDeployLoc
 	else
-	read -p "Are you a Glatt customer?(Y)" cust
+	read -p "Are you a Glatt customer?(y)" cust
 	cust=${cust:-y}
 		if  [ "$cust" == "y" ];  then
 			getDeployRem
 		else
-			read -p "Do you want to start tailscale for VPN access?(Y)" tscale
+		tscale=${cust:-n}
+			read -p "Do you want to start tailscale for VPN access?(n)" tscale
 			if  [ "$tscale" == "y" ];  then
 #	show qrcode for tailscale url
 				tsURL=$(sudo service tailscaled status | grep -oP "(https)://login.([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")                           
