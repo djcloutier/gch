@@ -229,8 +229,8 @@ else
 		if  [ "$cust" == "y" ];  then
 			getDeployRem
 		else
-		tscale=${cust:-n}
 			read -p "Do you want to start tailscale for VPN access?(n)" tscale
+			tscale=${tscale:-n}
 			if  [ "$tscale" == "y" ];  then
 #	show qrcode for tailscale url
 				tsURL=$(sudo service tailscaled status | grep -oP "(https)://login.([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")                           
