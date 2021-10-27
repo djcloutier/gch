@@ -52,47 +52,23 @@ reboot
 
 getDeployRem () {
 
-
-mkdir ${BLOC}/${DeployRepo}
-chmod 777 ${BLOC}/${DeployRepo}
-
-if [ -d "${BLOC}/${DeployRepo}" ]; then
-echo "Found local repository...Using that."
-find ${BLOC}/${DeployRepo}/ -type f -iname "*.sh" -exec chmod +x {} \;
-
-#install the GUI
-${BLOC}/${DeployRepo}/scripts/install-gui.sh
-
-else
-getCredentials
-
-filepath="${SPLocation}getdeployment.sh"
-wget -q --no-check-certificate --user=$username --password=$password $filepath
-
-if [ "$?" = "0" ]; then
-		echo "Login successful"
-		
-		#strip carriage returns from text file in case it was saved in DOS format
-                sed -i -e 's/\r//g' ${BLOC}/getdeployment.sh
-		
-		chmod +x ${BLOC}/getdeployment.sh
-		exec ${BLOC}/getdeployment.sh $username $password
-		rm ${BLOC}/startup.sh
-		exit 1
-		
-	
-else
-		credsStatus="fail"
-		read -p "Invalid login. Try again?" retry
-		retry=${retry:-y}
-
-		if  [ "$retry" == "y" ];  then
-		    getDeploy
-		fi
-
-fi
+if compgen -G "~/glatt-tools*.deb" > /dev/null; then
+    DEBEXISTS=true
 fi
 
+FILE=${BLOC}/${DeployRepo}/scripts/install-gui.sh
+FILE2=
+if test -f "$FILE" || $DEBEXISTS; then
+    
+	cp ~/glatt-tools_*.deb /tmp/glatt-tools.deb
+	sudo apt install -y /tmp/glatt-tools.deb
+	sudo rm /tmp/glatt-tools.deb
+
+	#install the GUI
+	${BLOC}/${DeployRepo}/scripts/install-gui.sh
+else
+	echo "Please install Glatt-Tools manually or place the .deb filein your home folder and run setup again."
+fi
 }
 
 
@@ -258,7 +234,7 @@ else
 	read -p "Are you a Glatt customer?(Y)" cust
 	cust=${cust:-y}
 		if  [ "$cust" == "y" ];  then
-			installGuiRemote
+			echo "Please install the glatt tools package a
 		else
 			read -p "Do you want to start tailscale for VPN access?(Y)" tscale
 			if  [ "$tscale" == "y" ];  then
