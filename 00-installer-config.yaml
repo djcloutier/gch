@@ -1,13 +1,17 @@
-# This is the network config written by 'subiquity'
+#Default network configuration
+#Layout for UNO-2484G
+
+#LAN A: enp0s31f6
+#LAN B: enp1s0
+#LAN C: enp3s0
+#LAN D: enp2s0
+
 network:
   renderer: NetworkManager
   ethernets:
-    enp0s31f6:
-      dhcp4: true
-    enp1s0:
-      dhcp4: true
     enp2s0:
       dhcp4: true
-    enp3s0:
-      dhcp4: true
+      addresses:
+      - 192.168.1.254/24
+
   version: 2
